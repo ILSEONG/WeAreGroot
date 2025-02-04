@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="kr.co.moran.web.order">
+  		<select id="selectOrderAllByMid" parameterType="int" resultType="kr.co.moran.web.vo.order.OrderVO">
+   			SELECT 
+			    O.o_id AS oId, 
+			    O.m_id AS mId, 
+			    O.pd_id AS pdId, 
+			    O.o_date AS date, 
+			    O.o_total AS total,
+			    O.o_cnt AS cnt, 
+			    O.o_status AS status, 
+			    O.o_memo AS memo, 
+			    O.o_uuid AS uuid,
+			    O.o_name AS name,
+			    O.o_phone AS phone,
+			    O.o_zipcode AS zipcode,
+			    O.o_address AS address,
+			    O.o_addressDetail addressDetail,
+			    P.pd_name AS pdName,
+                PI.pi_img AS img
+			FROM 
+			    ORDERS O
+			JOIN 
+			    PRODUCT P ON O.pd_id = P.pd_id
+            JOIN 
+                PRODUCT_IMG PI ON PI.pd_id = P.pd_id
+			WHERE
+   				O.m_id = #{mId} AND PI.pi_no = 0;
+   		</select>
+
+
+		<insert id="insertOrder" parameterType="kr.co.moran.web.vo.order.OrderVO">
+			INSERT INTO ORDERS
+				(
+					m_id, 
+					pd_id, 
+					o_date, 
+					o_total, 
+					o_cnt, 
+					o_status, 
+					o_uuid, 
+					o_memo, 
+					o_name, 
+					o_phone, 
+					o_zipcode, 
+					o_address, 
+					o_addressDetail
+				)
+			VALUES
+				(
+					#{mId}, 
+					#{pdId}, 
+					NOW(), 
+					#{total}, 
+					#{cnt}, 
+					0, 
+					#{uuid}, 
+					#{memo}, 
+					#{name}, 
+					#{phone}, 
+					#{zipcode}, 
+					#{address}, 
+					#{addressDetail}
+				)
+		</insert>
+
+  </mapper>

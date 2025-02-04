@@ -1,7 +1,5 @@
 package kr.co.moran.web.action.member;
 
-import java.io.IOException;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -15,7 +13,7 @@ public class LogoutAction implements Action {
 		if(session != null) {
 			session.invalidate();
 		}
-		return "redirect:index.jsp";
+		return "redirect:main";
 	}
 
 }

@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.moran.product">
+	<!-- insert -->
+	<!-- 상품 정보 등록 -->
+	<insert id="addProduct" parameterType="kr.co.moran.web.vo.ProductVO"
+		useGeneratedKeys="true" keyColumn="pd_id" keyProperty="pId" >
+		INSERT INTO PRODUCT (
+		    c_id, pd_name, pd_price, pd_description,
+		    pd_quantity, pd_wholesale, pd_dcrate, pd_created_at,
+		    pd_is_maintain, pd_retention_period)
+		VALUES (
+			#{cId}, #{name}, #{price}, #{description},
+			#{quantity}, #{wholesale}, #{dcRate}, #{createDate}, 0, null
+		)
+	</insert>
+	
+	<!-- 상품 이미지 저장 -->
+	<insert id="addProductImg" parameterType="kr.co.moran.web.vo.ProductImgVO">
+		insert into PRODUCT_IMG (pd_id, pi_no, pi_img)
+		values(#{pId}, #{no}, #{img})
+	</insert>
+
+
+	<!-- select -->
+	<!-- product -->
+	<!-- 상품 전체 조회 -->
+	<select id="selectAll" resultType="kr.co.moran.web.vo.ProductVO">
+		select 	pd_id pId,
+		        c_id cId,
+		        pd_name as name,
+		        pd_price as price,
+		        pd_description as description,
+		        pd_quantity as quantity,
+		        pd_wholesale as wholesale,
+		        pd_dcRate as dcRate,
+		        pd_created_at as createDate,
+		        pd_is_maintain as isMaintain,
+		        pd_retention_period as retetionDate
+		from PRODUCT
+		where pd_is_maintain = 0
+	</select>
+	
+	<!-- 검색으로 상품 조회 -->
+	<select id="pdSelectBySearch" parameterType="map" resultType="kr.co.moran.web.vo.ProductVO">
+		select 	pd_id pId,
+		        c_id cId,
+		        pd_name as name,
+		        pd_price as price,
+		        pd_description as description,
+		        pd_quantity as quantity,
+		        pd_wholesale as wholesale,
+		        pd_dcRate as dcRate,
+		        pd_created_at as createDate,
+		        pd_is_maintain as isMaintain,
+		        pd_retention_period as retetionDate
+		from PRODUCT
+		where pd_is_maintain = 0
+			and (pd_name like #{keyword}
+			or pd_description like #{keyword})
+		LIMIT #{start}, #{pageNum}
+	</select>
+
+	<!-- 보관처리 목록 조회 -->
+	<select id="pdSelectBySave" parameterType="map" resultType="kr.co.moran.web.vo.ProductVO">
+		select 	pd_id as pId,
+		        c_id as cId,
+		        pd_name as name,
+		        pd_price as price,
+		        pd_description as description,
+		        pd_quantity as quantity,
+		        pd_wholesale as wholesale,
+		        pd_dcRate as dcRate,
+		        pd_created_at as createDate,
+		        pd_is_maintain as isMaintain,
+		        pd_retention_period as retetionDate
+        from MORANMORAN.PRODUCT
+        where pd_is_maintain = 1
+		ORDER BY pd_retention_period desc
+		LIMIT #{start}, #{pageNum}
+	</select>
+
+	<!-- 보관처리 목록 갯수 조회 -->
+	<select id="pdSaveCnt" resultType="int">
+		select count(*)
+        from MORANMORAN.PRODUCT
+        where pd_is_maintain = 1
+	</select>
+
+	<!-- 품절 목록 조회 -->
+	<select id="pdSelectBySoldOut" parameterType="map" resultType="kr.co.moran.web.vo.ProductVO">
+		select 	pd_id as pId,
+		        c_id as cId,
+		        pd_name as name,
+		        pd_price as price,
+		        pd_description as description,
+		        pd_quantity as quantity,
+		        pd_wholesale as wholesale,
+		        pd_dcRate as dcRate,
+		        pd_created_at as createDate,
+		        pd_is_maintain as isMaintain,
+		        pd_retention_period as retetionDate
+        from MORANMORAN.PRODUCT
+        where pd_quantity = 0
+		ORDER BY pd_retention_period desc
+		LIMIT #{start}, #{pageNum}
+	</select>
+
+	<!-- 품절 목록 갯수 조회 -->
+	<select id="pdSoldOutCnt" resultType="int">
+		select count(*)
+        from MORANMORAN.PRODUCT
+        where pd_quantity = 0
+	</select>
+
+	<!-- 상품 목록 조회  -->
+	<select id="selectPage" parameterType="HashMap" resultType="kr.co.moran.web.vo.ProductVO">
+		select 	pd_id as pId,
+		        c_id as cId,
+		        pd_name as name,
+		        pd_price as price,
+		        pd_description as description,
+		        pd_quantity as quantity,
+		        pd_wholesale as wholesale,
+		        pd_dcRate as dcRate,
+		        pd_created_at as createDate,
+		        pd_is_maintain as isMaintain,
+		        pd_retention_period as retetionDate
+		from MORANMORAN.PRODUCT
+		where pd_is_maintain = 0
+		LIMIT #{start}, #{pageNum}
+	</select>
+
+	<!-- 상품 1개 조회 -->
+	<select id="selectByPId" parameterType="int" resultType="kr.co.moran.web.vo.ProductVO">
+		select 	pd_id as pId,
+		        c_id as cId,
+		        pd_name as name,
+		        pd_price as price,
+		        pd_description as description,
+		        pd_quantity as quantity,
+		        pd_wholesale as wholesale,
+		        pd_dcRate as dcRate,
+		        pd_created_at as createDate,
+		        pd_is_maintain as isMaintain,
+		        pd_retention_period as retetionDate
+		from MORANMORAN.PRODUCT
+		where pd_is_maintain = 0 and pd_id = #{pd_id}
+	</select>
+	
+	
+	<!-- *관리자용* 상품 1개 조회 -->
+	<select id="selectByPIdAdmin" parameterType="int" resultType="kr.co.moran.web.vo.ProductVO">
+		select 	pd_id as pId,
+		        c_id as cId,
+		        pd_name as name,
+		        pd_price as price,
+		        pd_description as description,
+		        pd_quantity as quantity,
+		        pd_wholesale as wholesale,
+		        pd_dcRate as dcRate,
+		        pd_created_at as createDate,
+		        pd_is_maintain as isMaintain,
+		        pd_retention_period as retetionDate
+		from MORANMORAN.PRODUCT
+		where pd_id = #{pd_id}
+	</select>
+	
+	<!-- 전체 상품 종류 총 갯수 -->
+	<select id="pdTotal" resultType="int">
+		select count(*)
+		from MORANMORAN.PRODUCT
+		where pd_is_maintain = 0
+	</select>
+	
+	<!-- 최신순 조회 -->
+	<select id="pdSelectLatest" parameterType="Map" resultType="kr.co.moran.web.vo.ProductVO">
+		select 	pd_id as pId,
+		        c_id as cId,
+		        pd_name as name,
+		        pd_price as price,
+		        pd_description as description,
+		        pd_quantity as quantity,
+		        pd_wholesale as wholesale,
+		        pd_dcRate as dcRate,
+		        pd_created_at as createDate,
+		        pd_is_maintain as isMaintain,
+		        pd_retention_period as retetionDate
+        from MORANMORAN.PRODUCT
+        where DATEDIFF(now(), pd_created_at) &lt; 61
+        	and pd_is_maintain = 0
+		ORDER BY createDate desc
+		LIMIT #{start}, #{pageNum}
+	</select>
+	
+	<!-- 최신상퐁 종류 총 갯수 -->
+	<select id="pdLatestTotal" resultType="int">
+		select count(*)
+        from MORANMORAN.PRODUCT
+        where DATEDIFF(now(), pd_created_at) &lt; 61
+        	and pd_is_maintain = 0
+	</select>
+	
+	<!-- 카테고리 조회 -->
+	<select id="pdSelectByCId" parameterType="Map" resultType="kr.co.moran.web.vo.ProductVO">
+		select 	pd_id as pId,
+		        c_id as cId,
+		        pd_name as name,
+		        pd_price as price,
+		        pd_description as description,
+		        pd_quantity as quantity,
+		        pd_wholesale as wholesale,
+		        pd_dcRate as dcRate,
+		        pd_created_at as createDate,
+		        pd_is_maintain as isMaintain,
+		        pd_retention_period as retetionDate
+        from MORANMORAN.PRODUCT
+        where c_id = #{C_ID} and pd_is_maintain = 0
+		ORDER BY pd_id
+		LIMIT #{start}, #{pageNum}
+	</select>
+	
+	<!-- 카테고리상퐁 종류 총 갯수 -->	
+	<select id="pdcategoryTotal" parameterType="int" resultType="int">
+		select count(*)
+        from MORANMORAN.PRODUCT
+        where c_id = #{C_ID} and pd_is_maintain = 0
+	</select>
+	
+	<!-- product img -->
+	<select id="selectAllImgByPId" parameterType="int" resultType="kr.co.moran.web.vo.ProductImgVO">
+		select pd_id as pId, pi_no as no, pi_img as img
+		from MORANMORAN.PRODUCT_IMG
+		where pd_id = #{pd_id} 
+	</select>
+	
+	<select id="piSelsctBigimgByPid" parameterType="int" resultType="kr.co.moran.web.vo.ProductImgVO">
+		select pd_id as pId, pi_no no, pi_img img
+		from MORANMORAN.PRODUCT_IMG
+		where pd_id = #{pd_id} and pi_no = 0
+	</select>
+	
+	
+	
+	
+	<!-- order -->
+	<select id="orderTotalByPid" parameterType="int" resultType="int">
+		select count(*) from ORDERS where pd_id = #{pd_id}
+	</select>
+	
+	<!-- 인기 조회 -->
+	<select id="pdSelectPop" parameterType="Map" resultType="kr.co.moran.web.vo.ProductVO">
+		select  pd_id as pId,
+		        c_id as cId,
+		        pd_name as name,
+		        pd_price as price,
+		        pd_description as description,
+		        pd_quantity as quantity,
+		        pd_wholesale as wholesale,
+		        pd_dcRate as dcRate,
+		        pd_created_at as createDate,
+		        pd_is_maintain as isMaintain,
+		        pd_retention_period as retetionDate
+        from PRODUCT 
+        where pd_id in (
+	        select pd_id from (
+		        SELECT pd_id, COUNT(*) as hit
+		        FROM ORDERS
+		        WHERE pd_id IN (SELECT pd_id FROM PRODUCT
+		    					where pd_is_maintain = 0)
+		        GROUP BY pd_id
+		        ORDER BY hit desc
+		        LIMIT #{start}, #{pageNum}
+		    ) as pop
+		)
+	</select>
+	
+	<!-- 인기상품 id 조회 -->
+	<select id="pdSelectPopByPId" parameterType="Map" resultType="int">
+		select pd_id from (
+			SELECT pd_id, COUNT(*) as hit
+			FROM ORDERS
+			WHERE pd_id IN (SELECT pd_id FROM PRODUCT
+		    				where pd_is_maintain = 0)
+			GROUP BY pd_id
+			ORDER BY hit desc
+			LIMIT 36
+		) as pop
+	</select>
+	
+	<!-- 인기 상퐁 종류 총 갯수 -->
+	<select id="pdPopTotal" resultType="int">
+		select count(*)
+		from (
+		    SELECT COUNT(*) as hit
+		    FROM ORDERS
+		    WHERE pd_id IN (SELECT pd_id FROM PRODUCT
+		    				where pd_is_maintain = 0)
+		    GROUP BY pd_id
+		) as pop
+	</select>
+	
+	
+	<!-- 상품 재등록 -->
+	<update id="pdUpdateSet" parameterType="kr.co.moran.web.vo.ProductVO">
+		update PRODUCT 
+		set 
+	        c_id #{cId},
+	        pd_name #{name},
+	        pd_price #{price},
+	        pd_description #{description},
+	        pd_quantity #{quantity},
+	        pd_wholesale #{wholesale},
+	        pd_dcRate #{dcRate},
+	        pd_created_at #{createDate},
+	        pd_is_maintain #{isMaintain},
+	        pd_retention_period #{retetionDate}
+		where pd_id = #{pd_id}
+	</update>
+	
+	<!-- 판매 중단 -->
+	<update id="pdDeleteSet" parameterType="map">
+		update PRODUCT
+		set pd_is_maintain = 1,
+		    pd_retention_period = #{date}
+		where pd_id = #{pId}
+	</update>
+	
+	<!-- 재고가 없는 상품 판매 중단 -->
+	<update id="">
+		update PRODUCT
+		set pd_is_maintain = 1,
+		    pd_retention_period = #{date}
+		where pd_quantity = 0
+	</update>
+	
+	<!-- 보관기간 지날 시 삭제 -->
+	<delete id="pdAutoDelete">
+		delete from PRODUCT
+		where now() > pd_retention_period;
+	</delete>
+	
+</mapper>
